@@ -495,10 +495,19 @@ impl From<db::Media> for api::MediaSourceInfo {
             protocol,
             is_remote,
             name: Some(
-                source
-                    .title
-                    .clone(),
-            ),
+    source
+        .stream_info
+        .as_ref()
+        .and_then(|si| si.filename.as_deref())
+        .and_then(|f| {
+            std::path::Path::new(f)
+                .file_stem()
+                .and_then(|s| s.to_str())
+        })
+        .filter(|s| !s.is_empty())
+        .map(str::to_owned)
+        .unwrap_or_else(|| source.title.clone()),
+),
             container,
             remux,
             has_segments: !is_stub,
