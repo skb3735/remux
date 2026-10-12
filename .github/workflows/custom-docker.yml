@@ -1,0 +1,25 @@
+
+name: Custom Remux Docker
+
+on:
+  push:
+    branches:
+      - full-stream-filenames-v0361
+    paths:
+      - .github/workflows/custom-docker.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build custom Remux
+    uses: ./.github/workflows/build.yml
+    with:
+      version: "0.36.1-custom"
+      docker_tags: "-t ghcr.io/skb3735/remux:full-stream-filenames-v0361"
+      desktop: false
+      ref: full-stream-filenames-v0361
+    secrets: inherit
