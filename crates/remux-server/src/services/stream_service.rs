@@ -380,15 +380,24 @@ impl StreamService {
 
     /// Display name for `MediaSources[idx].Name`.
     pub fn source_name_for(&self, effective: &db::Media) -> String {
-        self.group
-            .as_ref()
-            .map(|(_, t, _)| t.clone())
-            .unwrap_or_else(|| {
-                effective
-                    .title
-                    .clone()
-            })
-    }
+    self.group
+        .as_ref()
+        .map(|(_, t, _)| t.clone())
+        .unwrap_or_else(|| {
+            effective
+                .stream_info
+                .as_ref()
+                .and_then(|si| si.filename.as_deref())
+                .and_then(|f| {
+                    std::path::Path::new(f)
+                        .file_stem()
+                        .and_then(|s| s.to_str())
+                })
+                .filter(|s| !s.is_empty())
+                .map(str::to_owned)
+                .unwrap_or_else(|| effective.title.clone())
+        })
+}
 
     fn candidates(&self) -> &[db::Media] {
         self.group
